@@ -23,7 +23,12 @@ const blogFinder = async (req, res, next) => {
   }
 
 router.get("/", async(req,res)=>{
-    const blogs = await Blog.findAll()
+    const blogs = await Blog.findAll({
+        include:{
+            model: User
+        },
+        attributes:{exclude:["userId"]}
+    })
     res.json(blogs)
 })
 
@@ -39,13 +44,24 @@ router.post("/", tokenExtractor, async(req,res)=>{
 
 })
 
-router.delete("/:id", blogFinder, async(req,res)=>{
-    const blog = req.blog
-    await blog.destroy()
-    res.send("destroyed blog")
+router.delete("/:id",tokenExtractor, blogFinder, async(req,res)=>{
+    try {
+        const user = await User.findByPk(req.decodedToken.id)
+        if(user.id === req.blog.userId){
+            const blog = req.blog
+            await blog.destroy()
+            res.send("destroyed blog")
+        } else{
+            res.status(400).send("not your blog")
+        }
+
+    } catch (error) {
+        res.status(400).send(error)
+    }
+
 })
 
-router.put("/:id", blogFinder, async(req,res)=>{
+router.put("/:id", tokenExtractor, blogFinder, async(req,res)=>{
     req.blog.likes = req.body.likes
     await req.blog.save()
     res.json(req.blog)
