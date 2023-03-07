@@ -1,21 +1,37 @@
 const router = require("express").Router()
+const jwt = require("jsonwebtoken")
+const {SECRET} = require("../util/config")
+const {Blog,User} = require("../models")
 
-const {Blog} = require("../models")
+const tokenExtractor = (req, res, next) => {
+    const authorization = req.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+      try {
+        req.decodedToken = jwt.verify(authorization.substring(7), SECRET)
+      } catch{
+        return res.status(401).json({ error: 'token invalid' })
+      }
+    }  else {
+      return res.status(401).json({ error: 'token missing' })
+    }
+    next()
+}
 
 const blogFinder = async (req, res, next) => {
     req.blog = await Blog.findByPk(req.params.id)
     next()
   }
 
-router.get("/",async(req,res)=>{
+router.get("/", async(req,res)=>{
     const blogs = await Blog.findAll()
     res.json(blogs)
 })
 
-router.post("/",async(req,res)=>{
-    const {author,url,title,likes} = req.query
+router.post("/", tokenExtractor, async(req,res)=>{
+    const {author,url,title,likes} = req.body
+    const user = await User.findByPk(req.decodedToken.id)
     if(author && url && title && likes){
-        const blog = await Blog.create({author,url,title,likes})
+        const blog = await Blog.create({author,url,title,likes,userId:user.id})
         res.json(blog)
     } else{
         res.status(400).send("missing parameters")
