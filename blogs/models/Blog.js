@@ -23,7 +23,23 @@ Blog.init({
   likes: {
     type: DataTypes.INTEGER,
     allowNull: false
-  }
+  },
+  year: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: {
+        args: [1991],
+        msg: 'Year must be at least 1991',
+      },
+      max: {
+        args: [new Date().getFullYear()],
+        msg: 'Year cannot be greater than the current year',
+      },
+      isInt: {
+        msg: 'Year must be an integer',
+      }
+  }}
 }, {
   sequelize,
   underscored: true,
