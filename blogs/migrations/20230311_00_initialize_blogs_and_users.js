@@ -23,11 +23,11 @@ async function up(queryInterface, Sequelize)  {
       type: DataTypes.INTEGER,
       allowNull: false
     },		
-    createdAt: {
+    created_at: {
       type: Sequelize.DATE,
       allowNull: false
     },
-    updatedAt: {
+    updated_at: {
       type: Sequelize.DATE,
       allowNull: false
     },
@@ -52,15 +52,15 @@ async function up(queryInterface, Sequelize)  {
       type: DataTypes.STRING,
       allowNull: false
     },
-    passwordHash:{
+    password_hash:{
       type: DataTypes.STRING,
       allowNull: false
     },
-    createdAt: {
+    created_at: {
       type: Sequelize.DATE,
       allowNull: false
     },
-    updatedAt: {
+    updated_at: {
       type: Sequelize.DATE,
       allowNull: false
     }

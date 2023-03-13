@@ -52,10 +52,10 @@ router.get("/", async(req,res)=>{
 
 
 router.post("/", tokenExtractor, async(req,res)=>{
-    const {author,url,title,likes} = req.body
+    const {author,url,title,likes,year} = req.body
     const user = await User.findByPk(req.decodedToken.id)
     if(author && url && title && likes){
-        const blog = await Blog.create({author,url,title,likes,userId:user.id})
+        const blog = await Blog.create({author,url,title,likes,userId:user.id,year})
         res.json(blog)
     } else{
         res.status(400).send("missing parameters")

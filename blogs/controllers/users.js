@@ -13,6 +13,17 @@ router.get('/', async (req, res) => {
   res.json(users)
 })
 
+router.get('/:id', async (req, res) => {
+  const users = await User.findByPk(req.params.id,{
+    include:{
+      model: Blog,
+      as:"readers",
+      attributes:{exclude:['userId','createdAt','updatedAt']},
+    }
+  })
+  res.json(users)
+})
+
 router.post('/', async (req, res) => {
   try {
     const {username,name,password} = req.body
@@ -20,6 +31,7 @@ router.post('/', async (req, res) => {
     const user = await User.create({username,name,passwordHash})
     res.json(user)
   } catch(error) {
+    console.log(error)
     return res.status(400).json({ error })
   }
 })
