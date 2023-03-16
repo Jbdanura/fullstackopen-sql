@@ -5,6 +5,7 @@ const { User, Blog } = require('../models')
 
 router.get('/', async (req, res) => {
   const users = await User.findAll({
+    attributes:{exclude:["passwordHash"]},
     include:{
       model: Blog,
       attributes:{exclude:["userId"]}
@@ -14,11 +15,20 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
+  let where = {}
+  if(req.query.read){
+    where.read = req.query.read === "true"
+  }
   const users = await User.findByPk(req.params.id,{
+    attributes:{exclude:["passwordHash"]},
     include:{
       model: Blog,
-      as:"readers",
+      as:"readings",
       attributes:{exclude:['userId','createdAt','updatedAt']},
+      through:{
+        attributes:["id","read"],
+        where
+      }
     }
   })
   res.json(users)
