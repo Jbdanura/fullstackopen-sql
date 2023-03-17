@@ -26,6 +26,9 @@ router.post("/",async(req,res)=>{
 router.post("/:id",tokenExtractor,async(req,res)=>{
     try {
         const user = await User.findByPk(req.decodedToken.id)
+        if(user.disabled){
+          return res.status(400).send("user disabled")
+        }
         const readingList = await ReadingList.findByPk(req.params.id)
         if(!user || !readingList){
             return res.status(400).send("missing user/reading list")

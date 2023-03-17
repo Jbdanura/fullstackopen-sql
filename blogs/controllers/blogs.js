@@ -54,6 +54,9 @@ router.get("/", async(req,res)=>{
 router.post("/", tokenExtractor, async(req,res)=>{
     const {author,url,title,likes,year} = req.body
     const user = await User.findByPk(req.decodedToken.id)
+    if(user.disabled){
+        return res.status(400).send("user disabled")
+      }
     if(author && url && title && likes){
         const blog = await Blog.create({author,url,title,likes,userId:user.id,year})
         res.json(blog)
@@ -65,6 +68,9 @@ router.post("/", tokenExtractor, async(req,res)=>{
 
 router.delete("/:id",tokenExtractor, blogFinder, async(req,res)=>{
     const user = await User.findByPk(req.decodedToken.id)
+    if(user.disabled){
+        return res.status(400).send("user disabled")
+      }
     if(user.id === req.blog.userId){
         const blog = req.blog
         await blog.destroy()

@@ -7,7 +7,9 @@ const {User} = require('../models')
 router.post('/', async (req, res) => {
   try {
     const user = await User.findOne({where: {username: req.body.username}})
-
+    if(user.disabled){
+      return res.status(400).send("user disabled")
+    }
     const passwordCorrect = user === null ? false : await bcrypt.compare(req.body.password, user.passwordHash)
 
     if (!(user && passwordCorrect)) {
